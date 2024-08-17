@@ -1,0 +1,221 @@
+Front-End (HTML, CSS, JavaScript)
+
+1.HTML(index.html)
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>To-Do List</h1>
+        <form id="task-form">
+            <input type="text" id="task-input" placeholder="Enter a new task" required>
+            <button type="submit">Add Task</button>
+        </form>
+        <ul id="task-list"></ul>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+
+2.CSS(style.css)
+ body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    width: 300px;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+form {
+    display: flex;
+    gap: 10px;
+}
+
+input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+button {
+    padding: 10px;
+    border: none;
+    background: #28a745;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #218838;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0 0;
+}
+
+li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+li.completed span {
+    text-decoration: line-through;
+    color: #999;
+}
+
+button.edit, button.delete {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 5px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+button.edit:hover {
+    background: #0056b3;
+}
+
+button.delete {
+    background: #dc3545;
+}
+
+button.delete:hover {
+    background: #c82333;
+}
+
+3.JavaScript(script.js)
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('task-form');
+    const taskInput = document.getElementById('task-input');
+    const taskList = document.getElementById('task-list');
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const taskText = taskInput.value.trim();
+        if (taskText) {
+            addTask(taskText);
+            taskInput.value = '';
+        }
+    });
+
+    function addTask(text) {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <span>${text}</span>
+            <div>
+                <button class="edit">Edit</button>
+                <button class="delete">Delete</button>
+                <button class="complete">Complete</button>
+            </div>
+        `;
+        taskList.appendChild(li);
+
+        li.querySelector('.complete').addEventListener('click', () => {
+            li.classList.toggle('completed');
+        });
+
+        li.querySelector('.edit').addEventListener('click', () => {
+            const newText = prompt('Edit Task', text);
+            if (newText !== null && newText.trim()) {
+                li.querySelector('span').textContent = newText;
+            }
+        });
+
+        li.querySelector('.delete').addEventListener('click', () => {
+            taskList.removeChild(li);
+        });
+    }
+});
+
+Back-End (Node.js with Express)
+1.Initialize the project
+
+mkdir todo-app
+cd todo-app
+npm init -y
+npm install express body-parser cors
+
+2.server code(server.js)
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+
+const app = express();
+const port = 3000;
+
+app.use(cors());
+app.use(bodyParser.json());
+app.use(express.static('public'));
+
+let tasks = [];
+
+app.get('/tasks', (req, res) => {
+    res.json(tasks);
+});
+
+app.post('/tasks', (req, res) => {
+    const newTask = req.body;
+    tasks.push(newTask);
+    res.status(201).json(newTask);
+});
+
+app.put('/tasks/:id', (req, res) => {
+    const { id } = req.params;
+    const updatedTask = req.body;
+    tasks = tasks.map(task => task.id === id ? updatedTask : task);
+    res.json(updatedTask);
+});
+
+app.delete('/tasks/:id', (req, res) => {
+    const { id } = req.params;
+    tasks = tasks.filter(task => task.id !== id);
+    res.status(204).end();
+});
+
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+});
+
+3. Project Structuretodo-app/
+│
+├── public/
+│   ├── index.html
+│   ├── styles.css
+│   └── script.js
+│
+├── server.js
+└── package.json
+
+4. Running the Application
+Start the server:
+node server.js
+Open public/index.html in a web browser to view and interact with the To-Do List.
+
